@@ -1,0 +1,736 @@
+---
+import '../styles/global.css';
+
+const proofItems = [
+  'Deteccion en vivo durante la partida',
+  'Overlay flotante configurable',
+  'Debilidades, fortalezas e inmunidades',
+  'Sprites, stats, evolucion y movimientos',
+];
+
+const mainFeatures = [
+  {
+    eyebrow: 'En directo',
+    title: 'Lee al rival mientras juegas',
+    text: 'PokeScan captura la zona util de la pantalla, detecta el nombre del Pokemon rival con OCR y actualiza la informacion sin obligarte a salir del combate.',
+  },
+  {
+    eyebrow: 'Overlay',
+    title: 'Toda la ventaja tactica encima del emulador',
+    text: 'El overlay flotante muestra nombre, tipos, debilidades, fortalezas e inmunidades en una vista rapida que puedes mover, redimensionar y activar cuando la necesites.',
+  },
+  {
+    eyebrow: 'Inteligencia',
+    title: 'No solo identifica: te ayuda a decidir',
+    text: 'La app no se queda en el nombre. Tambien recupera stats, descripcion, cadena evolutiva, movimientos por nivel y mas informacion util para jugar mejor.',
+  },
+];
+
+const experienceSteps = [
+  ['01', 'Activas la deteccion en vivo', 'PokeScan se conecta a la captura de pantalla y queda listo para analizar la partida mientras juegas.'],
+  ['02', 'Detecta al Pokemon rival', 'El OCR localiza el nombre con una lectura continua optimizada para evitar repeticiones y mantener la respuesta agil.'],
+  ['03', 'Te muestra el matchup al instante', 'Ves debilidades, fortalezas, inmunidades y datos clave sin romper el ritmo del combate.'],
+];
+
+const infoTabs = [
+  'Descripcion',
+  'Stats',
+  'Movimientos',
+  'Debilidades',
+  'Fortalezas',
+  'Inmunidades',
+  'Evolucion',
+  'Fotos',
+  'Curiosidades',
+];
+
+const overlayThemes = [
+  ['Predeterminado', 'Base oscura y limpia para lectura rapida.', 'media/overlay-theme-default.jpg', 1812, 2176],
+  ['Purpura', 'Estetica energica con panel translucido.', 'media/overlay-theme-purple.jpg', 1812, 2176],
+  ['Pokemon X', 'Azul electrico con borde frio y tecnico.', 'media/overlay-theme-x.jpg', 1812, 2176],
+  ['Pokemon Y', 'Coral intenso con caracter agresivo.', 'media/overlay-theme-y.jpg', 1812, 2176],
+  ['Zafiro', 'Azul cristal para un look mas elegante.', 'media/overlay-theme-sapphire.jpg', 1812, 2176],
+  ['Esmeralda', 'Verde profundo con acento competitivo.', 'media/overlay-theme-emerald.jpg', 1812, 2176],
+];
+
+const supportedGames = [
+  ['Pokemon X / Y', 'Overlay tematizable con versiones visuales inspiradas en ambas ediciones.'],
+  ['Pokemon Rubi Omega / Zafiro Alfa', 'Soporte planteado desde ajustes para tus partidas en 3DS y emulador.'],
+];
+
+const productShots = [
+  ['Combate en vivo', 'media/hero-overlay-live.jpg', 'Visualiza al rival, sus tipos y sus puntos clave directamente durante el combate.', 2176, 1812],
+  ['Overlay listo', 'media/overlay-idle.jpg', 'Mantiene la informacion siempre accesible sobre la partida, lista para activarse cuando la necesites.', 2176, 1812],
+  ['Vista completa', 'media/app-description-combee.jpg', 'Combina deteccion, consulta tactica y navegacion avanzada en una sola experiencia.', 1812, 2176],
+];
+
+const tabShots = [
+  ['Descripcion', 'media/tab-description-skitty.jpg', 1812, 2176],
+  ['Stats', 'media/tab-stats-skitty.jpg', 1812, 2176],
+  ['Movimientos', 'media/tab-moves-skitty.jpg', 1812, 2176],
+  ['Debilidades', 'media/tab-weaknesses-skitty.jpg', 1812, 2176],
+  ['Inmunidades', 'media/tab-immunities-skitty.jpg', 1812, 2176],
+  ['Evolucion', 'media/tab-evolution-skitty.jpg', 1812, 2176],
+  ['Fotos', 'media/tab-photos-skitty.jpg', 1812, 2176],
+  ['Curiosidades', 'media/tab-curiosities-skitty.jpg', 1812, 2176],
+];
+
+const faqs = [
+  ['Que hace diferente a PokeScan?', 'No es una simple consulta manual. Detecta al Pokemon rival en vivo y coloca la informacion tactica encima de la partida con un overlay configurable.'],
+  ['Que informacion muestra?', 'Nombre, tipos, debilidades, fortalezas, inmunidades, stats, descripcion, evolucion, movimientos por nivel, fotos y curiosidades.'],
+  ['Se puede personalizar?', 'Si. La app incluye varios estilos de overlay: predeterminado, purpura, Pokemon X, Pokemon Y, Zafiro y Esmeralda.'],
+  ['Para que juegos esta orientado?', 'En la configuracion actual se presenta como compatible con Pokemon X / Y y Pokemon Rubi Omega / Zafiro Alfa.'],
+];
+
+const marqueeText =
+  'POKESCAN · OCR EN VIVO · OVERLAY FLOTANTE · DEBILIDADES Y FORTALEZAS · PERSONALIZACION · EVOLUCION Y MOVIMIENTOS · POKESCAN · OCR EN VIVO · OVERLAY FLOTANTE · DEBILIDADES Y FORTALEZAS · PERSONALIZACION · EVOLUCION Y MOVIMIENTOS ·';
+---
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="description"
+    content="PokeScan convierte tu combate en informacion tactica en tiempo real con OCR, overlay flotante y analisis instantaneo del Pokemon rival."
+  />
+  <title>PokeScan | Overlay competitivo para combates Pokemon</title>
+  <script is:inline>
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
+    let navAnimationFrame = null;
+    let panelScrollFrame = null;
+    let snapPanels = [];
+    let isPanelAnimating = false;
+
+    const easeInOutQuint = (t) =>
+      t < 0.5 ? 16 * t * t * t * t * t : 1 - Math.pow(-2 * t + 2, 5) / 2;
+
+    const stopHeaderAnimation = () => {
+      if (navAnimationFrame !== null) cancelAnimationFrame(navAnimationFrame);
+      navAnimationFrame = null;
+      if (panelScrollFrame !== null) cancelAnimationFrame(panelScrollFrame);
+      panelScrollFrame = null;
+    };
+
+    const getHeaderHeight = () => {
+      const header = document.querySelector('.site-header');
+      return header ? header.getBoundingClientRect().height : 0;
+    };
+
+    const getTargetY = (target) =>
+      Math.max(0, target.getBoundingClientRect().top + window.scrollY - getHeaderHeight());
+
+    const animateToTarget = (targetY) => {
+      stopHeaderAnimation();
+      isPanelAnimating = true;
+      document.documentElement.classList.add('nav-scrolling');
+
+      const startY = window.scrollY;
+      const distance = targetY - startY;
+
+      if (Math.abs(distance) < 2) {
+        window.scrollTo(0, targetY);
+        document.documentElement.classList.remove('nav-scrolling');
+        isPanelAnimating = false;
+        return;
+      }
+
+      const duration = Math.min(1400, Math.max(850, Math.abs(distance) * 0.75));
+      const startTime = performance.now();
+
+      const animate = (now) => {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = easeInOutQuint(progress);
+
+        window.scrollTo(0, startY + distance * eased);
+
+        if (progress < 1) {
+          navAnimationFrame = requestAnimationFrame(animate);
+          return;
+        }
+
+        window.scrollTo(0, targetY);
+        document.documentElement.classList.remove('nav-scrolling');
+        navAnimationFrame = null;
+        isPanelAnimating = false;
+      };
+
+      navAnimationFrame = requestAnimationFrame(animate);
+    };
+
+    const scrollHeaderLink = (selector) => {
+      const target = document.querySelector(selector);
+      if (!target) return;
+      const isMobileViewport = window.innerWidth <= 860;
+
+      if (isMobileViewport) {
+        stopHeaderAnimation();
+        const mobileTargetY = getTargetY(target);
+        window.scrollTo({ top: mobileTargetY, behavior: 'smooth' });
+        return;
+      }
+
+      animateToTarget(getTargetY(target));
+    };
+
+    const getClosestPanelIndex = () => {
+      if (!snapPanels.length) return 0;
+
+      const currentY = window.scrollY + getHeaderHeight();
+      let closestIndex = 0;
+      let closestDistance = Number.POSITIVE_INFINITY;
+
+      snapPanels.forEach((panel, index) => {
+        const distance = Math.abs(panel.offsetTop - currentY);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
+        }
+      });
+
+      return closestIndex;
+    };
+
+    const goToPanel = (index) => {
+      if (!snapPanels.length) return;
+      const clampedIndex = Math.max(0, Math.min(index, snapPanels.length - 1));
+      animateToTarget(getTargetY(snapPanels[clampedIndex]));
+    };
+
+    const setupRevealAnimations = () => {
+      const singleItems = [
+        '.hero-shot',
+        '.content-highlight',
+      ];
+
+      singleItems.forEach((selector) => {
+        document.querySelectorAll(selector).forEach((element) => {
+          element.classList.add('reveal-item');
+        });
+      });
+
+      const staggerGroups = [
+        '.theme-grid .theme-card',
+        '.product-grid .media-card',
+        '.tabs-gallery .tab-card',
+      ];
+
+      staggerGroups.forEach((selector) => {
+        document.querySelectorAll(selector).forEach((element, index) => {
+          element.classList.add('reveal-item');
+          element.style.setProperty('--reveal-delay', `${index * 180}ms`);
+        });
+      });
+
+      const revealItems = [...document.querySelectorAll('.reveal-item')];
+      if (!revealItems.length) return;
+
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reducedMotion) {
+        revealItems.forEach((item) => item.classList.add('is-visible'));
+        return;
+      }
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          });
+        },
+        {
+          threshold: 0.2,
+          rootMargin: '0px 0px -8% 0px',
+        },
+      );
+
+      revealItems.forEach((item) => observer.observe(item));
+    };
+
+    const animatePanelScroll = (panel, targetTop) => {
+      stopHeaderAnimation();
+      isPanelAnimating = true;
+
+      const startTop = panel.scrollTop;
+      const distance = targetTop - startTop;
+
+      if (Math.abs(distance) < 2) {
+        panel.scrollTop = targetTop;
+        isPanelAnimating = false;
+        return;
+      }
+
+      const duration = Math.min(900, Math.max(520, Math.abs(distance) * 0.6));
+      const startTime = performance.now();
+
+      const animate = (now) => {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = easeInOutQuint(progress);
+
+        panel.scrollTop = startTop + distance * eased;
+
+        if (progress < 1) {
+          panelScrollFrame = requestAnimationFrame(animate);
+          return;
+        }
+
+        panel.scrollTop = targetTop;
+        panelScrollFrame = null;
+        isPanelAnimating = false;
+      };
+
+      panelScrollFrame = requestAnimationFrame(animate);
+    };
+
+    const handlePanelAdvance = (direction) => {
+      const currentIndex = getClosestPanelIndex();
+      const currentPanel = snapPanels[currentIndex];
+
+      if (!currentPanel) return;
+
+      const maxScrollTop = Math.max(0, currentPanel.scrollHeight - currentPanel.clientHeight);
+      const remainingDown = maxScrollTop - currentPanel.scrollTop;
+      const remainingUp = currentPanel.scrollTop;
+      const step = Math.max(220, currentPanel.clientHeight * 0.82);
+
+      if (direction > 0 && remainingDown > 12) {
+        animatePanelScroll(currentPanel, Math.min(maxScrollTop, currentPanel.scrollTop + step));
+        return;
+      }
+
+      if (direction < 0 && remainingUp > 12) {
+        animatePanelScroll(currentPanel, Math.max(0, currentPanel.scrollTop - step));
+        return;
+      }
+
+      goToPanel(currentIndex + direction);
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.location.hash) {
+        history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+      }
+
+      document.documentElement.classList.add('presentation-mode');
+      snapPanels = [...document.querySelectorAll('.snap-panel')];
+      setupRevealAnimations();
+
+      document
+        .querySelectorAll('.brand[href^="#"], .site-nav a[href^="#"], .header-download[href^="#"], .mobile-menu-panel a[href^="#"]')
+        .forEach((link) => {
+          link.addEventListener('click', (event) => {
+          if (window.innerWidth <= 860) {
+            event.preventDefault();
+            const selector = link.getAttribute('href');
+            const details = link.closest('details');
+            if (details) details.removeAttribute('open');
+            if (selector) window.setTimeout(() => scrollHeaderLink(selector), details ? 140 : 0);
+            return;
+          }
+
+          event.preventDefault();
+          const selector = link.getAttribute('href');
+          const details = link.closest('details');
+          if (details) details.removeAttribute('open');
+          if (selector) scrollHeaderLink(selector);
+        });
+      });
+
+      window.addEventListener(
+        'wheel',
+        (event) => {
+          if (window.innerWidth <= 860) return;
+          if (Math.abs(event.deltaY) < 18) return;
+
+          event.preventDefault();
+          if (isPanelAnimating) return;
+          handlePanelAdvance(event.deltaY > 0 ? 1 : -1);
+        },
+        { passive: false },
+      );
+
+      window.addEventListener('keydown', (event) => {
+        if (window.innerWidth <= 860) return;
+        if (isPanelAnimating) {
+          if (
+            ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(event.key)
+          ) {
+            event.preventDefault();
+          }
+          return;
+        }
+
+        const currentIndex = getClosestPanelIndex();
+
+        if (event.key === 'ArrowDown' || event.key === 'PageDown' || event.key === ' ') {
+          event.preventDefault();
+          handlePanelAdvance(1);
+        }
+
+        if (event.key === 'ArrowUp' || event.key === 'PageUp') {
+          event.preventDefault();
+          handlePanelAdvance(-1);
+        }
+
+        if (event.key === 'Home') {
+          event.preventDefault();
+          goToPanel(0);
+        }
+
+        if (event.key === 'End') {
+          event.preventDefault();
+          goToPanel(snapPanels.length - 1);
+        }
+      });
+    });
+
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) window.scrollTo(0, 0);
+    });
+  </script>
+</head>
+<body>
+  <div class="page-noise"></div>
+  <div class="page-grid"></div>
+
+  <header class="site-header">
+    <a class="brand" href="#inicio" aria-label="Ir al inicio de PokeScan">
+      <img class="brand-logo" src="media/pokescan-logo.png" alt="Logo de PokeScan" width="512" height="512" />
+      <span class="brand-copy">
+        <strong>PokeScan</strong>
+        <small>Combat Assistant</small>
+      </span>
+    </a>
+
+    <nav class="site-nav">
+      <a href="#producto">Producto</a>
+      <a href="#overlay">Overlay</a>
+      <a href="#contenido">Contenido</a>
+      <a href="#media">Media</a>
+    </nav>
+
+    <a class="header-cta header-download" href="#cta">Descargar</a>
+
+    <details class="mobile-menu">
+      <summary aria-label="Abrir menu de navegacion">
+        <span></span>
+        <span></span>
+        <span></span>
+      </summary>
+      <div class="mobile-menu-panel">
+        <a href="#producto">Producto</a>
+        <a href="#overlay">Overlay</a>
+        <a href="#contenido">Contenido</a>
+        <a href="#media">Media</a>
+      </div>
+    </details>
+  </header>
+
+  <nav class="mobile-dock" aria-label="Navegacion movil">
+    <a href="#producto">Producto</a>
+    <a href="#overlay">Overlay</a>
+    <a href="#contenido">Contenido</a>
+    <a href="#media">Media</a>
+    <a class="mobile-dock-download" href="#cta">Descargar</a>
+  </nav>
+
+  <main id="inicio">
+    <section class="snap-panel">
+      <div class="snap-marquee" aria-hidden="true"><div>{marqueeText}</div></div>
+      <div class="hero shell">
+      <div class="hero-copy">
+        <p class="eyebrow">Android Studio · OCR en vivo · overlay configurable</p>
+        <h1>Detecta al Pokemon rival en vivo y toma decisiones con ventaja.</h1>
+        <p class="hero-text">
+          PokeScan analiza la partida en tiempo real, detecta el Pokemon rival y te entrega
+          debilidades, fortalezas, inmunidades y datos avanzados en un overlay flotante que
+          acompana el combate sin romper tu ritmo.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#producto">Explorar producto</a>
+          <a class="btn btn-secondary" href="#media">Ver demostracion</a>
+        </div>
+
+        <div class="proof-strip" aria-label="Pruebas clave del producto">
+          {proofItems.map((item) => <span>{item}</span>)}
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="signal-card signal-card-top">
+          <span class="signal-pill live">Live detection</span>
+          <strong>Informacion al instante</strong>
+          <p>El overlay identifica al rival y muestra el matchup clave sin obligarte a salir del combate.</p>
+        </div>
+
+        <figure class="hero-shot">
+          <img src="media/hero-overlay-live.jpg" alt="PokeScan mostrando el overlay sobre un combate de Pokemon con Combee detectado en vivo." width="2176" height="1812" loading="eager" />
+        </figure>
+
+        <div class="signal-card signal-card-bottom">
+          <span class="signal-pill custom">Custom overlay</span>
+          <strong>6 estilos visuales</strong>
+          <p class="signal-card-note">Predeterminado, Purpura, Pokemon X, Pokemon Y, Zafiro y Esmeralda.</p>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <section id="producto" class="snap-panel">
+      <div class="snap-marquee" aria-hidden="true"><div>{marqueeText}</div></div>
+      <div class="shell section-block">
+      <div class="section-heading">
+        <p class="eyebrow">Propuesta de valor</p>
+        <h2>Un asistente de combate pensado para leer, interpretar y responder en tiempo real.</h2>
+        <p>
+          PokeScan convierte la pantalla de juego en informacion tactica inmediata con deteccion
+          continua, overlay flotante y una ficha completa de cada Pokemon.
+        </p>
+      </div>
+
+      <div class="feature-columns">
+        {mainFeatures.map((feature) => (
+          <article class="feature-panel">
+            <p class="feature-eyebrow">{feature.eyebrow}</p>
+            <h3>{feature.title}</h3>
+            <p>{feature.text}</p>
+          </article>
+        ))}
+      </div>
+      </div>
+    </section>
+
+    <section class="snap-panel">
+      <div class="snap-marquee" aria-hidden="true"><div>{marqueeText}</div></div>
+      <div class="shell section-block split-showcase">
+      <div class="showcase-copy">
+        <p class="eyebrow">Lo que vende mejor</p>
+        <h2>Un combate no espera. La informacion tampoco deberia hacerlo.</h2>
+        <p>
+          En lugar de obligarte a buscar tablas o abrir webs externas, PokeScan presenta el matchup
+          delante de ti: nombre detectado, multiplicadores utiles y lectura inmediata de riesgo.
+        </p>
+        <ul class="check-list">
+          <li>Reduce friccion y tiempo de decision.</li>
+          <li>Ayuda a jugadores casuales y competitivos.</li>
+          <li>Convierte una funcionalidad tecnica en una promesa comercial clara.</li>
+        </ul>
+      </div>
+
+      <div class="combat-board">
+        <article class="board-card board-card-main">
+          <span class="mini-tag">Realtime OCR</span>
+          <strong>MediaProjection + OCR continuo</strong>
+          <p>Lectura periodica, control de repeticiones y respuesta orientada a combate real.</p>
+        </article>
+        <article class="board-card">
+          <span class="mini-tag alt">Overlay</span>
+          <strong>Flotante, movible y redimensionable</strong>
+        </article>
+        <article class="board-card">
+          <span class="mini-tag green">Tactica</span>
+          <strong>Debilidades, fortalezas e inmunidades</strong>
+        </article>
+        <article class="board-card">
+          <span class="mini-tag amber">Profundidad</span>
+          <strong>Stats, evolucion, movimientos, fotos y curiosidades</strong>
+        </article>
+      </div>
+      </div>
+    </section>
+
+    <section class="snap-panel">
+      <div class="snap-marquee" aria-hidden="true"><div>{marqueeText}</div></div>
+      <div class="shell section-block">
+      <div class="section-heading narrow">
+        <p class="eyebrow">Como funciona</p>
+        <h2>Tres pasos para pasar de ver al rival a jugar con mas criterio.</h2>
+      </div>
+
+      <div class="steps-grid">
+        {experienceSteps.map(([number, title, text]) => (
+          <article class="step-card">
+            <span>{number}</span>
+            <h3>{title}</h3>
+            <p>{text}</p>
+          </article>
+        ))}
+      </div>
+      </div>
+    </section>
+
+    <section id="overlay" class="snap-panel">
+      <div class="snap-marquee" aria-hidden="true"><div>{marqueeText}</div></div>
+      <div class="shell section-block overlay-section">
+      <div class="section-heading">
+        <p class="eyebrow">Personalizacion del overlay</p>
+        <h2>Elige el estilo que mejor encaja con tu partida y juega con una interfaz que se siente tuya.</h2>
+        <p>
+          PokeScan incluye varios disenios de overlay para que la informacion sea util, visible y
+          coherente con la estetica que prefieres en pantalla.
+        </p>
+      </div>
+
+      <div class="theme-grid">
+        {overlayThemes.slice(0, 3).map(([name, text, image, width, height]) => (
+          <article class="theme-card">
+            <img class="theme-shot" src={image} alt={`Captura del estilo de overlay ${name} en PokeScan.`} width={width} height={height} loading="lazy" />
+            <h3>{name}</h3>
+            <p>{text}</p>
+          </article>
+        ))}
+      </div>
+      </div>
+    </section>
+
+    <section class="snap-panel">
+      <div class="snap-marquee" aria-hidden="true"><div>{marqueeText}</div></div>
+      <div class="shell section-block overlay-section overlay-section-compact">
+      <div class="section-heading narrow">
+        <p class="eyebrow">Mas estilos</p>
+        <h2>Mas opciones visuales para adaptar el overlay a tu version favorita.</h2>
+      </div>
+
+      <div class="theme-grid">
+        {overlayThemes.slice(3).map(([name, text, image, width, height]) => (
+          <article class="theme-card">
+            <img class="theme-shot" src={image} alt={`Captura del estilo de overlay ${name} en PokeScan.`} width={width} height={height} loading="lazy" />
+            <h3>{name}</h3>
+            <p>{text}</p>
+          </article>
+        ))}
+      </div>
+      </div>
+    </section>
+
+    <section id="contenido" class="snap-panel">
+      <div class="snap-marquee" aria-hidden="true"><div>{marqueeText}</div></div>
+      <div class="shell section-block content-section">
+      <div class="content-copy">
+        <p class="eyebrow">Profundidad de producto</p>
+        <h2>Mucho mas que una deteccion: toda la ficha del Pokemon en una sola app.</h2>
+        <p>
+          Consulta descripcion, stats, movimientos, debilidades, inmunidades, evolucion, fotos y
+          curiosidades sin depender de busquedas externas ni cortar el ritmo de juego.
+        </p>
+      </div>
+
+      <div class="content-panels">
+        <article class="data-stack">
+          <small>Pestanas disponibles</small>
+          <div class="tab-cloud">
+            {infoTabs.map((tab) => <span>{tab}</span>)}
+          </div>
+        </article>
+
+        <article class="compat-card">
+          <small>Juegos compatibles en la app</small>
+          <div class="compat-list">
+            {supportedGames.map(([title, text]) => (
+              <div>
+                <strong>{title}</strong>
+                <p>{text}</p>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article class="content-highlight">
+          <img src="media/app-description-combee.jpg" alt="Pantalla principal de PokeScan con descripcion de Pokedex, tabs y overlay visible." width="1812" height="2176" loading="lazy" />
+          <div>
+            <strong>Todo el contexto en una sola vista</strong>
+            <p>
+              Desde una sola pantalla accedes a la informacion principal del rival, navegas por sus
+              tabs y mantienes el overlay disponible para jugar con rapidez.
+            </p>
+          </div>
+        </article>
+      </div>
+      </div>
+    </section>
+
+    <section id="media" class="snap-panel">
+      <div class="snap-marquee" aria-hidden="true"><div>{marqueeText}</div></div>
+      <div class="shell section-block media-section">
+      <div class="section-heading">
+        <p class="eyebrow">Demostracion visual</p>
+        <h2>La experiencia se entiende mejor cuando ves el overlay funcionando sobre el juego real.</h2>
+        <p>
+          Cada captura refuerza una promesa distinta del producto: deteccion en vivo,
+          disponibilidad inmediata y profundidad de informacion.
+        </p>
+      </div>
+
+      <div class="product-grid">
+        {productShots.map(([title, image, text, width, height]) => (
+          <article class="media-card">
+            <img class="media-shot" src={image} alt={title} width={width} height={height} loading="lazy" />
+            <h3>{title}</h3>
+            <p>{text}</p>
+          </article>
+        ))}
+      </div>
+
+      </div>
+    </section>
+
+    <section class="snap-panel">
+      <div class="snap-marquee" aria-hidden="true"><div>{marqueeText}</div></div>
+      <div class="shell section-block media-section media-section-compact">
+      <div class="section-heading media-subhead">
+        <p class="eyebrow">Profundidad interna</p>
+        <h2>Explora cada Pokemon con datos utiles para decidir mejor durante y despues del combate.</h2>
+      </div>
+
+      <div class="tabs-gallery">
+        {tabShots.map(([title, image, width, height]) => (
+          <article class="tab-card">
+            <img src={image} alt={`Captura de la pestana ${title} dentro de PokeScan.`} width={width} height={height} loading="lazy" />
+            <h3>{title}</h3>
+          </article>
+        ))}
+      </div>
+      </div>
+    </section>
+
+    <section class="snap-panel">
+      <div class="snap-marquee" aria-hidden="true"><div>{marqueeText}</div></div>
+      <div class="shell section-block faq-section">
+      <div class="section-heading narrow">
+        <p class="eyebrow">Preguntas clave</p>
+        <h2>Todo lo importante, resuelto antes de empezar a usar PokeScan.</h2>
+      </div>
+
+      <div class="faq-list">
+        {faqs.map(([question, answer]) => (
+          <article class="faq-card">
+            <h3>{question}</h3>
+            <p>{answer}</p>
+          </article>
+        ))}
+      </div>
+      </div>
+    </section>
+
+    <section id="cta" class="snap-panel">
+      <div class="snap-marquee" aria-hidden="true"><div>{marqueeText}</div></div>
+      <div id="download-panel" class="shell final-cta">
+      <p class="eyebrow">Descarga PokeScan</p>
+      <h2>Descarga la app y lleva la informacion tactica directamente a tu partida.</h2>
+      <p>
+        PokeScan para Android te ofrece deteccion en vivo, overlay flotante, estilos
+        personalizables y datos clave del rival para jugar con mas seguridad desde el primer combate.
+      </p>
+      <div class="hero-actions centered">
+        <a class="btn btn-primary" href="downloads/PokeScan.apk" download>Descargar APK</a>
+        <a class="btn btn-secondary" href="#media">Ver capturas</a>
+      </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
