@@ -1020,6 +1020,31 @@ ul {
   margin: 1rem auto 0;
 }
 
+.site-footer {
+  position: relative;
+  z-index: 1;
+  padding: 1.25rem 0 2.4rem;
+  border-top: 1px solid rgba(160, 205, 255, 0.12);
+  background: rgba(4, 10, 18, 0.72);
+  backdrop-filter: blur(10px);
+}
+
+.site-footer-inner {
+  display: grid;
+  gap: 0.35rem;
+  text-align: center;
+}
+
+.site-footer p {
+  color: rgba(237, 246, 255, 0.88);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.site-footer strong {
+  color: var(--amber);
+}
+
 @keyframes beam {
   0%,
   100% {
